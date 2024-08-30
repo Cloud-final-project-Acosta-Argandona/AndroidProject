@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".ui.main.MainActivity">
 
     <TextView
@@ -71,8 +72,8 @@
         android:outlineSpotShadowColor="#BC1919"
         android:textColorHint="#7D7477"
         app:boxStrokeColor="#E91E63"
-        app:hintTextColor="#E91E63"
         app:boxStrokeWidth="4dp"
+        app:hintTextColor="#E91E63"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textinputEmail">
@@ -160,5 +161,18 @@
         app:layout_constraintBottom_toTopOf="@+id/buttonRegister"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/buttonEnterAccount" />
+
+    <Button
+        android:id="@+id/buttonAuthGOogle"
+        android:layout_width="185dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="114dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="112dp"
+        android:backgroundTint="#DDA5B8"
+        android:text="auth with google"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonRegister" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

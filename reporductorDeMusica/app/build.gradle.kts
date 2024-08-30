@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-
+    implementation(libs.play.services.auth)
     // viewmodel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 

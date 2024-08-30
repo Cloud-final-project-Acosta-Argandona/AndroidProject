@@ -1,6 +1,7 @@
 package com.example.reporductordemusica.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -32,4 +33,24 @@ class AuthViewModel : ViewModel() {
                 }
         }
     }
+
+    fun signInWithCredential(
+        credential: AuthCredential,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        viewModelScope.launch {
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = auth.currentUser
+                        val email = user?.email ?: ""
+                        onSuccess(email)
+                    } else {
+                        task.exception?.let { onFailure(it) }
+                    }
+                }
+        }
+    }
+
 }

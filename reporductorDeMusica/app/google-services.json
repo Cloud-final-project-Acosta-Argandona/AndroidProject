@@ -12,7 +12,20 @@
           "package_name": "com.example.reporductordemusica"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "308984595321-qvij4kfq0drtj8m52ode0sfs2qr2b77o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.reporductordemusica",
+            "certificate_hash": "18538e722b82ff0d0c21205e2bf4e2fe03dd5ddd"
+          }
+        },
+        {
+          "client_id": "308984595321-8dcted4f4jhbkdokdoji6nou20alb3u4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAhNN0F_N6K089NXjvlp-n1hWTdzZnFdJg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "308984595321-8dcted4f4jhbkdokdoji6nou20alb3u4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
