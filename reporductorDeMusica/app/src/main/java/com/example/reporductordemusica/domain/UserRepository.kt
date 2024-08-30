@@ -61,4 +61,28 @@ class UserRepository {
             onComplete(false)
         }
     }
+
+    fun getUserDetails(userEmail: String, onSuccess: (UserModel) -> Unit, onFailure: (Exception) -> Unit) {
+        firestore.collection("users").document(userEmail)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val user = document.toObject(UserModel::class.java)
+                    if (user != null) {
+                        Log.d("UserRepository", "User details retrieved successfully: $user")
+                        onSuccess(user)
+                    } else {
+                        Log.w("UserRepository", "User data conversion failed")
+                        onFailure(Exception("User data conversion failed"))
+                    }
+                } else {
+                    Log.w("UserRepository", "No such document")
+                    onFailure(Exception("No such document"))
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("UserRepository", "Error getting user details: ${exception.message}")
+                onFailure(exception)
+            }
+    }
 }
