@@ -1,5 +1,6 @@
 package com.example.reporductordemusica.ViewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,9 +30,17 @@ class SongListViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { snapshot ->
                 val songs = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Song::class.java)
+                    val song = doc.toObject(Song::class.java)?.apply {
+                        id = doc.id
+                    }
+                    Log.d("FirestoreDebug", "Document ID: ${doc.id}, Song: $song")
+                    song
                 }
                 _songs.value = songs
             }
+            .addOnFailureListener { exception ->
+                Log.w("FirestoreDebug", "Error getting songs: ${exception.message}")
+            }
+
     }
 }

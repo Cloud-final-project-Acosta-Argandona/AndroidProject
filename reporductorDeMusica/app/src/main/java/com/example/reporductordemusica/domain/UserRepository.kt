@@ -8,7 +8,7 @@ import com.google.firebase.firestore.firestore
 
 class UserRepository {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val firestore = Firebase.firestore
 
     fun registerUser(email: String, password: String, username: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
@@ -36,4 +36,29 @@ class UserRepository {
             }
     }
 
+    fun toggleFavoriteSong(userEmail: String, songId: String, onComplete: (Boolean) -> Unit) {
+        val userDocRef = firestore.collection("users").document(userEmail)
+
+        firestore.runTransaction { transaction ->
+            val userSnapshot = transaction.get(userDocRef)
+            val user = userSnapshot.toObject(UserModel::class.java) ?: return@runTransaction false
+
+            val updatedSongs = if (user.idSongs.contains(songId)) {
+                user.idSongs - songId
+            } else {
+                user.idSongs + songId
+            }
+
+            Log.d("UserRepository", "Updating user: $userEmail, songId: $songId, newSongsList: $updatedSongs")
+
+            transaction.update(userDocRef, "idSongs", updatedSongs)
+            updatedSongs.contains(songId)
+        }.addOnSuccessListener { isAdded ->
+            Log.d("UserRepository", "Transaction success, isAdded: $isAdded")
+            onComplete(isAdded)
+        }.addOnFailureListener { exception ->
+            Log.w("UserRepository", "Error updating favorites: ${exception.message}")
+            onComplete(false)
+        }
+    }
 }

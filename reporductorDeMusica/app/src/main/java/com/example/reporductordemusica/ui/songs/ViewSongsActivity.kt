@@ -13,13 +13,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.reporductordemusica.ViewModel.SongListViewModel
 import com.example.reporductordemusica.R
 import com.example.reporductordemusica.domain.Song
+import com.example.reporductordemusica.domain.UserRepository
 import com.example.reporductordemusica.ui.listArtist.ArtistListActivity
 
 class ViewSongsActivity : AppCompatActivity() {
     private val songListViewModel: SongListViewModel by viewModels()
     private var mediaPlayer: MediaPlayer? = null
     private var lastPosition: Int = 0
-
+    private val userRepository = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class ViewSongsActivity : AppCompatActivity() {
 
         val artistId = intent.getStringExtra("ARTIST_ID")
         val listView = findViewById<ListView>(R.id.listMusicView)
-        val adapter = SongAdapter(this, mutableListOf(), ::playPauseSong)
+        val adapter = SongAdapter(this, mutableListOf(), ::playPauseSong, userRepository)
         listView.adapter = adapter
 
         artistId?.let {
