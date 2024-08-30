@@ -11,7 +11,10 @@ class UserViewModel : ViewModel() {
 
     fun registerUser(email: String, password: String, username: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         viewModelScope.launch {
-            userRepository.registerUser(email, password, username, onSuccess, onFailure)
+            userRepository.registerUser(email, password, username, {
+                onSuccess()
+            }, onFailure)
         }
     }
+
 }
