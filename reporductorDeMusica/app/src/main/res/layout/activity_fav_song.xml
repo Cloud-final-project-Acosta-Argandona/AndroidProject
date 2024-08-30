@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="128dp"
+        android:layout_height="118dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="27dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_launcher_background" />
+
+    <TextView
+        android:id="@+id/textViewNameFavSong"
+        android:layout_width="259dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="1dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Nombre Cancion"
+        android:textColor="#DE80A0"
+        android:textColorLink="#F4BED1"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/artistnamesongfav"
+        android:layout_width="262dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="3dp"
+        android:fontFamily="sans-serif-light"
+        android:text="Artits: name artist"
+        android:textColor="#DE648C"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNameFavSong" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="74dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="61dp"
+        android:clickable="true"
+        app:backgroundTint="#F1CBD8"
+        app:fabCustomSize="36dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/floatingActionButton7"
+        app:layout_constraintTop_toBottomOf="@+id/artistnamesongfav"
+        app:srcCompat="@android:drawable/ic_media_play" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        app:backgroundTint="#F8C9D9"
+        app:fabCustomSize="36dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toBottomOf="@+id/artistnamesongfav"
+        app:srcCompat="@android:drawable/btn_star" />
+</androidx.constraintlayout.widget.ConstraintLayout>

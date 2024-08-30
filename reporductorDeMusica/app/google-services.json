@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308984595321",
+    "project_id": "cloud-final-project-a56a0",
+    "storage_bucket": "cloud-final-project-a56a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308984595321:android:62c78f9e14f2305ce5e5a8",
+        "android_client_info": {
+          "package_name": "com.example.reporductordemusica"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhNN0F_N6K089NXjvlp-n1hWTdzZnFdJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
