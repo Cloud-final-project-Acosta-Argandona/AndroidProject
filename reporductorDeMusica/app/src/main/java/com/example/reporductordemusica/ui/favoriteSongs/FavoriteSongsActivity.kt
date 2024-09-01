@@ -16,11 +16,16 @@ import com.example.reporductordemusica.ui.FavoriteSongsAdapter
 import com.example.reporductordemusica.ui.listArtist.ArtistListActivity
 import com.example.reporductordemusica.domain.UserRepository
 import kotlinx.coroutines.launch
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
 
 class FavoriteSongsActivity : AppCompatActivity() {
     private val userRepository = UserRepository()
     private val songRepository = SongRepository()
     private val artistRepository = ArtistRepository()
+
+    var player: SimpleExoPlayer? = null
+    private var currentlyPlayingSong: Song? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +61,14 @@ class FavoriteSongsActivity : AppCompatActivity() {
                                 }
 
                                 val listView = findViewById<ListView>(R.id.ListViewFavSongs)
-                                val adapter = FavoriteSongsAdapter(this@FavoriteSongsActivity, songArtistMap)
+                                val adapter = FavoriteSongsAdapter(
+                                    this@FavoriteSongsActivity,
+                                    songArtistMap,
+                                    currentlyPlayingSong,
+                                    onPlayClick = { song ->
+                                        togglePlayPause(song)
+                                    }
+                                )
                                 listView.adapter = adapter
 
                             } catch (e: Exception) {
@@ -72,5 +84,56 @@ class FavoriteSongsActivity : AppCompatActivity() {
         } else {
             Log.w("FavoriteSongsActivity", "No user is currently logged in")
         }
+    }
+
+    private fun togglePlayPause(song: Song) {
+        if (currentlyPlayingSong == song && player?.isPlaying == true) {
+            player?.pause()
+        } else {
+            if (currentlyPlayingSong != song) {
+                playSong(song)
+            } else {
+                player?.play()
+            }
+        }
+        val listView = findViewById<ListView>(R.id.ListViewFavSongs)
+        (listView.adapter as FavoriteSongsAdapter).notifyDataSetChanged()
+    }
+
+    private fun playSong(song: Song) {
+        if (player == null) {
+            player = SimpleExoPlayer.Builder(this).build()
+        }
+
+        if (currentlyPlayingSong == song) {
+            if (player?.isPlaying == true) {
+                player?.pause()
+            } else {
+                player?.play()
+            }
+        } else {
+            val mediaItem = MediaItem.fromUri(song.storageUrl)
+            player?.apply {
+                setMediaItem(mediaItem)
+                prepare()
+                playWhenReady = true
+            }
+            currentlyPlayingSong = song
+        }
+
+        val listView = findViewById<ListView>(R.id.ListViewFavSongs)
+        (listView.adapter as FavoriteSongsAdapter).updateCurrentlyPlayingSong(currentlyPlayingSong)
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        player?.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        player?.release()
+        player = null
     }
 }
