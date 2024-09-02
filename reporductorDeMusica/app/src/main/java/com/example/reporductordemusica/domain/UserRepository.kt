@@ -10,7 +10,7 @@ import com.google.firebase.firestore.ListenerRegistration
 class UserRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance()
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
     fun registerUser(email: String, password: String, username: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {

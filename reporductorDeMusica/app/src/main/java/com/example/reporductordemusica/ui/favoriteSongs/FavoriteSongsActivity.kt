@@ -12,14 +12,19 @@ import com.example.reporductordemusica.ViewModel.FavoriteSongsViewModel
 import com.example.reporductordemusica.ui.FavoriteSongsAdapter
 import com.example.reporductordemusica.ui.listArtist.ArtistListActivity
 
+import com.google.firebase.analytics.FirebaseAnalytics
+
 class FavoriteSongsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: FavoriteSongsViewModel
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_favorite_songs)
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         viewModel = ViewModelProvider(this).get(FavoriteSongsViewModel::class.java)
 
@@ -32,6 +37,8 @@ class FavoriteSongsActivity : AppCompatActivity() {
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.floatingActionButton6).setOnClickListener {
             val intent = Intent(this, ArtistListActivity::class.java)
             startActivity(intent)
+
+            firebaseAnalytics.logEvent("navigate_to_artist_list", Bundle())
         }
 
         viewModel.favoriteSongs.observe(this) { songArtistMap ->
@@ -41,9 +48,21 @@ class FavoriteSongsActivity : AppCompatActivity() {
                 songArtistMap,
                 viewModel.currentlyPlayingSong.value,
                 onPlayClick = { song ->
+                    val playBundle = Bundle().apply {
+                        putString("song_title", song.name)
+                        putString("artist_name", song.artist)
+                    }
+                    firebaseAnalytics.logEvent("play_favorite_song", playBundle)
+
                     viewModel.togglePlayPause(song)
                 },
                 onRemoveClick = { song ->
+                    val removeBundle = Bundle().apply {
+                        putString("song_title", song.name)
+                        putString("artist_name", song.artist)
+                    }
+                    firebaseAnalytics.logEvent("remove_favorite_song", removeBundle)
+
                     viewModel.removeFavoriteSong(song)
                 }
             )
@@ -53,5 +72,8 @@ class FavoriteSongsActivity : AppCompatActivity() {
                 (listView.adapter as? FavoriteSongsAdapter)?.updateCurrentlyPlayingSong(currentlyPlayingSong)
             }
         }
+
+        firebaseAnalytics.logEvent("view_favorite_songs_screen", Bundle())
     }
 }
+

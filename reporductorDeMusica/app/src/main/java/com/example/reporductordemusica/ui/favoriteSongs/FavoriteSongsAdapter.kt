@@ -1,6 +1,7 @@
 package com.example.reporductordemusica.ui
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,14 +10,19 @@ import android.widget.TextView
 import com.example.reporductordemusica.R
 import com.example.reporductordemusica.domain.Song
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class FavoriteSongsAdapter(
     context: Context,
     private val songArtistMap: Map<Song, String>,
     private var currentlyPlayingSong: Song?,
     private val onPlayClick: (Song) -> Unit,
-    private val onRemoveClick: (Song) -> Unit // Added parameter
+    private val onRemoveClick: (Song) -> Unit
 ) : ArrayAdapter<Song>(context, 0, songArtistMap.keys.toList()) {
+
+    private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val song = getItem(position)
@@ -37,11 +43,29 @@ class FavoriteSongsAdapter(
             )
 
             floatingReproduce.setOnClickListener {
-                onPlayClick(songItem)
+                try {
+                    onPlayClick(songItem)
+                    val bundle = Bundle().apply {
+                        putString("song_name", songItem.name)
+                        putString("artist_name", songArtistMap[songItem])
+                    }
+                    firebaseAnalytics.logEvent("play_song", bundle)
+                } catch (e: Exception) {
+                    crashlytics.recordException(e)
+                }
             }
 
             floatingAddFav.setOnClickListener {
-                onRemoveClick(songItem)
+                try {
+                    onRemoveClick(songItem)
+                    val bundle = Bundle().apply {
+                        putString("song_name", songItem.name)
+                        putString("artist_name", songArtistMap[songItem])
+                    }
+                    firebaseAnalytics.logEvent("remove_favorite_song", bundle)
+                } catch (e: Exception) {
+                    crashlytics.recordException(e)
+                }
             }
         }
 
@@ -53,6 +77,3 @@ class FavoriteSongsAdapter(
         notifyDataSetChanged()
     }
 }
-
-
-
