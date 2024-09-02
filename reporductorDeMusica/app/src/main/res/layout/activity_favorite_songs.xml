@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00F1F1F1"
+    tools:context=".FavoriteSongsActivity">
+
+    <ListView
+        android:id="@+id/ListViewFavSongs"
+        android:layout_width="405dp"
+        android:layout_height="632dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/floatingActionButton6" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="81dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="33dp"
+        android:background="#F2D0D0"
+        android:clickable="true"
+        app:backgroundTint="#F6DDDD"
+        app:fabCustomSize="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/ListViewFavSongs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="227dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="23dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Favorite Song List"
+        android:textColor="#E992B0"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
