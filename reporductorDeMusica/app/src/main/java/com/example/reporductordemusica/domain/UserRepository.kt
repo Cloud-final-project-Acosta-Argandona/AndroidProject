@@ -86,4 +86,12 @@ class UserRepository {
                 onFailure(exception)
             }
     }
+
+    suspend fun getUserDetailsSync(userEmail: String): UserModel {
+        return firestore.collection("users").document(userEmail)
+            .get()
+            .await()
+            .toObject(UserModel::class.java) ?: throw Exception("User not found")
+    }
+
 }

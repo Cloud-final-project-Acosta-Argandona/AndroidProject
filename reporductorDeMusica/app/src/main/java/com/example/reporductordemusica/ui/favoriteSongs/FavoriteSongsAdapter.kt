@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import com.example.reporductordemusica.FavoriteSongsActivity
 import com.example.reporductordemusica.R
 import com.example.reporductordemusica.domain.Song
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,6 +16,11 @@ class FavoriteSongsAdapter(
     private var currentlyPlayingSong: Song?,
     private val onPlayClick: (Song) -> Unit
 ) : ArrayAdapter<Song>(context, 0, songArtistMap.keys.toList()) {
+
+    private val songViewMap = songArtistMap.keys.associateWith {
+        // Mapping song to view position for quick access
+        getPosition(it)
+    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val song = getItem(position)
@@ -30,11 +34,10 @@ class FavoriteSongsAdapter(
             songName.text = songItem.name
             artistName.text = songArtistMap[songItem]
 
-            if ((context as FavoriteSongsActivity).player?.isPlaying == true) {
-                floatingReproduce.setImageResource(android.R.drawable.ic_media_pause)
-            } else {
-                floatingReproduce.setImageResource(android.R.drawable.ic_media_play)
-            }
+            val isPlaying = currentlyPlayingSong == songItem
+            floatingReproduce.setImageResource(
+                if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+            )
 
             floatingReproduce.setOnClickListener {
                 onPlayClick(songItem)
@@ -44,8 +47,10 @@ class FavoriteSongsAdapter(
         return view
     }
 
-    fun updateCurrentlyPlayingSong(song: Song?) {
-        currentlyPlayingSong = song
+    fun updateCurrentlyPlayingSong(newSong: Song?) {
+        currentlyPlayingSong = newSong
         notifyDataSetChanged()
     }
 }
+
+
