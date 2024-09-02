@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -46,6 +47,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.play.services.auth)
     implementation(libs.exoplayer)
+    implementation(libs.firebase.crashlytics.ktx)
 
     // viewmodel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

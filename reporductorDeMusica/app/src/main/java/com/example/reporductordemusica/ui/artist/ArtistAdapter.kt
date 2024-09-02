@@ -20,8 +20,6 @@ class ArtistAdapter(context: Context, private val artists: MutableList<Artist>) 
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.activity_artist, parent, false)
         val nameTextView = view.findViewById<TextView>(R.id.textViewNombreMusic)
         val genreTextView = view.findViewById<TextView>(R.id.textViewGeneroArtist)
-        val imageView = view.findViewById<ImageView>(R.id.imageViewArtist)
-        imageView.setImageResource(R.drawable.ic_launcher_background)
         nameTextView.text = artist?.name
         genreTextView.text = artist?.genre
 

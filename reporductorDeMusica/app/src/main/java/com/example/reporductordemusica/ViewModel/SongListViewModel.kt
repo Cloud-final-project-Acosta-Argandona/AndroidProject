@@ -10,6 +10,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.storage
 
+import com.google.firebase.firestore.ListenerRegistration
+
 class SongListViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val _songs = MutableLiveData<List<Song>>()
@@ -18,6 +20,8 @@ class SongListViewModel : ViewModel() {
     private val _artist = MutableLiveData<Artist?>()
     val artist: MutableLiveData<Artist?> = _artist
 
+    private var songListenerRegistration: ListenerRegistration? = null
+
     fun fetchSongs(artistId: String) {
         firestore.collection("artists").document(artistId).get()
             .addOnSuccessListener { document ->
@@ -25,22 +29,28 @@ class SongListViewModel : ViewModel() {
                 _artist.value = artist
             }
 
-        firestore.collection("songs")
+        songListenerRegistration = firestore.collection("songs")
             .whereEqualTo("artist", artistId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val songs = snapshot.documents.mapNotNull { doc ->
-                    val song = doc.toObject(Song::class.java)?.apply {
-                        id = doc.id
-                    }
-                    Log.d("FirestoreDebug", "Document ID: ${doc.id}, Song: $song")
-                    song
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    Log.w("FirestoreDebug", "Error getting songs: ${exception.message}")
+                    return@addSnapshotListener
                 }
-                _songs.value = songs
-            }
-            .addOnFailureListener { exception ->
-                Log.w("FirestoreDebug", "Error getting songs: ${exception.message}")
-            }
 
+                if (snapshot != null) {
+                    val songs = snapshot.documents.mapNotNull { doc ->
+                        val song = doc.toObject(Song::class.java)?.apply {
+                            id = doc.id
+                        }
+                        song
+                    }
+                    _songs.value = songs
+                }
+            }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        songListenerRegistration?.remove()
     }
 }

@@ -10,6 +10,7 @@ import com.example.reporductordemusica.domain.MediaPlayerManager
 import com.example.reporductordemusica.domain.Song
 import com.example.reporductordemusica.domain.SongRepository
 import com.example.reporductordemusica.domain.UserRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.launch
 
 class FavoriteSongsViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,6 +19,7 @@ class FavoriteSongsViewModel(application: Application) : AndroidViewModel(applic
     private val songRepository = SongRepository()
     private val artistRepository = ArtistRepository()
     private val mediaPlayerManager = MediaPlayerManager(application)
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     private val _favoriteSongs = MutableLiveData<Map<Song, String>>()
     val favoriteSongs: LiveData<Map<Song, String>> get() = _favoriteSongs
@@ -76,9 +78,17 @@ class FavoriteSongsViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun playSong(song: Song) {
-        val position = mediaPlayerManager.getCurrentPosition()
-        mediaPlayerManager.playSong(song.storageUrl, position)
-        _currentlyPlayingSong.value = song
+        viewModelScope.launch {
+            try {
+                val position = mediaPlayerManager.getCurrentPosition()
+                mediaPlayerManager.playSong(song.storageUrl, position)
+                _currentlyPlayingSong.value = song
+            } catch (e: Exception) {
+                crashlytics.recordException(e)
+                crashlytics.log("Error playing song: ${e.localizedMessage}")
+                _errorMessage.value = "Error playing song: ${e.localizedMessage}"
+            }
+        }
     }
 
     fun removeFavoriteSong(song: Song) {

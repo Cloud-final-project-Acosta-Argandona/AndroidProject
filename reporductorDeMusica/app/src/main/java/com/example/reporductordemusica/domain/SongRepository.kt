@@ -1,5 +1,6 @@
 package com.example.reporductordemusica.domain
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -7,6 +8,7 @@ import kotlinx.coroutines.tasks.await
 class SongRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val songsCollection = firestore.collection("songs")
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     suspend fun getFavoriteSongsByIds(ids: List<String>): List<Song> {
         return try {
@@ -20,8 +22,10 @@ class SongRepository {
                 song?.copy(id = document.id)
             }
         } catch (e: Exception) {
+            crashlytics.setCustomKey("Song_IDs", ids.toString())
+            crashlytics.log("Error fetching favorite songs by IDs.")
+            crashlytics.recordException(e)
             emptyList()
         }
     }
-
 }

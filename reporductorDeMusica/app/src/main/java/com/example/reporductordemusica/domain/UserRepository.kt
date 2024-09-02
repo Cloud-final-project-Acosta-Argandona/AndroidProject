@@ -3,14 +3,15 @@ package com.example.reporductordemusica.domain
 import android.util.Log
 import com.example.reporductordemusica.Model.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.tasks.await
 
 class UserRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
-    val auth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val crashlytics = FirebaseCrashlytics.getInstance()
 
     fun registerUser(email: String, password: String, username: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
@@ -19,8 +20,12 @@ class UserRepository {
                     val user = UserModel(email, username, emptyList())
                     saveUserToFirestore(user, { onSuccess(email) }, onFailure)
                 } else {
-                    Log.w("UserRepository", "Authentication failed: ${task.exception?.message}")
-                    onFailure(task.exception ?: Exception("Authentication error"))
+                    val exception = task.exception ?: Exception("Authentication error")
+                    Log.w("UserRepository", "Authentication failed: ${exception.message}")
+                    crashlytics.setCustomKey("email", email)
+                    crashlytics.log("Authentication failed")
+                    crashlytics.recordException(exception)
+                    onFailure(exception)
                 }
             }
     }
@@ -33,6 +38,9 @@ class UserRepository {
             }
             .addOnFailureListener { exception ->
                 Log.w("UserRepository", "Error saving user: ${exception.message}")
+                crashlytics.setCustomKey("user_email", user.email)
+                crashlytics.log("Error saving user to Firestore")
+                crashlytics.recordException(exception)
                 onFailure(exception)
             }
     }
@@ -59,45 +67,23 @@ class UserRepository {
             onComplete(isAdded)
         }.addOnFailureListener { exception ->
             Log.w("UserRepository", "Error updating favorites: ${exception.message}")
+            crashlytics.setCustomKey("user_email", userEmail)
+            crashlytics.setCustomKey("song_id", songId)
+            crashlytics.log("Error updating favorite song")
+            crashlytics.recordException(exception)
             onComplete(false)
         }
     }
 
-    fun getUserDetails(userEmail: String, onSuccess: (UserModel) -> Unit, onFailure: (Exception) -> Unit) {
-        firestore.collection("users").document(userEmail)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val user = document.toObject(UserModel::class.java)
-                    if (user != null) {
-                        Log.d("UserRepository", "User details retrieved successfully: $user")
-                        onSuccess(user)
-                    } else {
-                        Log.w("UserRepository", "User data conversion failed")
-                        onFailure(Exception("User data conversion failed"))
-                    }
-                } else {
-                    Log.w("UserRepository", "No such document")
-                    onFailure(Exception("No such document"))
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w("UserRepository", "Error getting user details: ${exception.message}")
-                onFailure(exception)
-            }
-    }
-
-    suspend fun getUserDetailsSync(userEmail: String): UserModel {
-        return firestore.collection("users").document(userEmail)
-            .get()
-            .await()
-            .toObject(UserModel::class.java) ?: throw Exception("User not found")
-    }
-
-    fun addUserSnapshotListener(userEmail: String, onChanged: (UserModel) -> Unit, onError: (Exception) -> Unit): ListenerRegistration {
+    fun addUserSnapshotListener(userEmail: String, onChanged: (UserModel) -> Unit,
+                                onError: (Exception) -> Unit): ListenerRegistration {
         return firestore.collection("users").document(userEmail)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
+                    Log.w("UserRepository", "Snapshot listener error: ${e.message}")
+                    crashlytics.setCustomKey("user_email", userEmail)
+                    crashlytics.log("Error in snapshot listener")
+                    crashlytics.recordException(e)
                     onError(e)
                     return@addSnapshotListener
                 }
@@ -107,10 +93,20 @@ class UserRepository {
                     if (user != null) {
                         onChanged(user)
                     } else {
-                        onError(Exception("User data conversion failed"))
+                        val exception = Exception("User data conversion failed")
+                        Log.w("UserRepository", "User data conversion failed")
+                        crashlytics.setCustomKey("user_email", userEmail)
+                        crashlytics.log("Failed to convert user data")
+                        crashlytics.recordException(exception)
+                        onError(exception)
                     }
                 } else {
-                    onError(Exception("No such document"))
+                    val exception = Exception("No such document")
+                    Log.w("UserRepository", "No such document: $userEmail")
+                    crashlytics.setCustomKey("user_email", userEmail)
+                    crashlytics.log("Document not found")
+                    crashlytics.recordException(exception)
+                    onError(exception)
                 }
             }
     }

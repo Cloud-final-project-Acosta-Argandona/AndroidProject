@@ -9,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
 class ArtistListViewModel : ViewModel() {
-
     private val db = FirebaseFirestore.getInstance()
     private val _artists = MutableLiveData<MutableList<Artist>>()
     val artists: LiveData<MutableList<Artist>> get() = _artists
@@ -26,7 +25,6 @@ class ArtistListViewModel : ViewModel() {
                     val artistList = snapshot.documents.map { doc ->
                         doc.toObject(Artist::class.java)?.copy(id = doc.id) ?: Artist()
                     }.toMutableList()
-                    Log.d("artist", artistList.toString())
                     _artists.value = artistList
                 }
             }
