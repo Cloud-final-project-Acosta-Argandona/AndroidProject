@@ -27,28 +27,35 @@ class FavoriteSongsViewModel(application: Application) : AndroidViewModel(applic
 
     private val _errorMessage = MutableLiveData<String>()
 
-    fun loadFavoriteSongs() {
+    init {
+        observeFavoriteSongs()
+    }
+
+    private fun observeFavoriteSongs() {
         val currentUserEmail = userRepository.auth.currentUser?.email.orEmpty()
         if (currentUserEmail.isNotEmpty()) {
-            viewModelScope.launch {
-                try {
-                    val user = userRepository.getUserDetailsSync(currentUserEmail)
-                    val songIds = user.idSongs
-                    if (songIds.isNotEmpty()) {
-                        val favoriteSongs = songRepository.getFavoriteSongsByIds(songIds)
-                        val songArtistMap = mutableMapOf<Song, String>()
-                        for (song in favoriteSongs) {
-                            val artist = artistRepository.getArtistById(song.artist)
-                            songArtistMap[song] = artist?.name.orEmpty()
+            userRepository.addUserSnapshotListener(
+                userEmail = currentUserEmail,
+                onChanged = { user ->
+                    viewModelScope.launch {
+                        val songIds = user.idSongs
+                        if (songIds.isNotEmpty()) {
+                            val favoriteSongs = songRepository.getFavoriteSongsByIds(songIds)
+                            val songArtistMap = mutableMapOf<Song, String>()
+                            for (song in favoriteSongs) {
+                                val artist = artistRepository.getArtistById(song.artist)
+                                songArtistMap[song] = artist?.name.orEmpty()
+                            }
+                            _favoriteSongs.value = songArtistMap
+                        } else {
+                            _favoriteSongs.value = emptyMap()
                         }
-                        _favoriteSongs.value = songArtistMap
-                    } else {
-                        _errorMessage.value = "No favorite songs found for user."
                     }
-                } catch (e: Exception) {
-                    _errorMessage.value = "Failed to load favorite songs: ${e.localizedMessage}"
+                },
+                onError = { exception ->
+                    _errorMessage.value = "Failed to load favorite songs: ${exception.localizedMessage}"
                 }
-            }
+            )
         } else {
             _errorMessage.value = "No user email found."
         }
@@ -74,6 +81,24 @@ class FavoriteSongsViewModel(application: Application) : AndroidViewModel(applic
         _currentlyPlayingSong.value = song
     }
 
+    fun removeFavoriteSong(song: Song) {
+        val currentUserEmail = userRepository.auth.currentUser?.email.orEmpty()
+        if (currentUserEmail.isNotEmpty()) {
+            viewModelScope.launch {
+                try {
+                    userRepository.toggleFavoriteSong(currentUserEmail, song.id) { isRemoved ->
+                        if (!isRemoved) {
+                            _errorMessage.value = "Failed to remove song from favorites."
+                        }
+                    }
+                } catch (e: Exception) {
+                    _errorMessage.value = "Error removing song from favorites: ${e.localizedMessage}"
+                }
+            }
+        } else {
+            _errorMessage.value = "No user email found."
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

@@ -2,15 +2,15 @@ package com.example.reporductordemusica.domain
 
 import android.util.Log
 import com.example.reporductordemusica.Model.UserModel
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 class UserRepository {
 
-    val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    val firestore = Firebase.firestore
+    private val firestore = FirebaseFirestore.getInstance()
+    val auth = FirebaseAuth.getInstance()
 
     fun registerUser(email: String, password: String, username: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
@@ -94,4 +94,24 @@ class UserRepository {
             .toObject(UserModel::class.java) ?: throw Exception("User not found")
     }
 
+    fun addUserSnapshotListener(userEmail: String, onChanged: (UserModel) -> Unit, onError: (Exception) -> Unit): ListenerRegistration {
+        return firestore.collection("users").document(userEmail)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    onError(e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val user = snapshot.toObject(UserModel::class.java)
+                    if (user != null) {
+                        onChanged(user)
+                    } else {
+                        onError(Exception("User data conversion failed"))
+                    }
+                } else {
+                    onError(Exception("No such document"))
+                }
+            }
+    }
 }

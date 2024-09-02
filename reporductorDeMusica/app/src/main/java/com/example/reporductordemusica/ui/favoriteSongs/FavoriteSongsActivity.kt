@@ -42,6 +42,9 @@ class FavoriteSongsActivity : AppCompatActivity() {
                 viewModel.currentlyPlayingSong.value,
                 onPlayClick = { song ->
                     viewModel.togglePlayPause(song)
+                },
+                onRemoveClick = { song ->
+                    viewModel.removeFavoriteSong(song)
                 }
             )
             listView.adapter = adapter
@@ -50,8 +53,5 @@ class FavoriteSongsActivity : AppCompatActivity() {
                 (listView.adapter as? FavoriteSongsAdapter)?.updateCurrentlyPlayingSong(currentlyPlayingSong)
             }
         }
-
-        viewModel.loadFavoriteSongs()
     }
 }
-

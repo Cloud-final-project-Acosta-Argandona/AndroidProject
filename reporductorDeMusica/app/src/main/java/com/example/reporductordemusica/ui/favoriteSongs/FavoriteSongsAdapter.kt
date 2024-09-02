@@ -14,13 +14,9 @@ class FavoriteSongsAdapter(
     context: Context,
     private val songArtistMap: Map<Song, String>,
     private var currentlyPlayingSong: Song?,
-    private val onPlayClick: (Song) -> Unit
+    private val onPlayClick: (Song) -> Unit,
+    private val onRemoveClick: (Song) -> Unit // Added parameter
 ) : ArrayAdapter<Song>(context, 0, songArtistMap.keys.toList()) {
-
-    private val songViewMap = songArtistMap.keys.associateWith {
-        // Mapping song to view position for quick access
-        getPosition(it)
-    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val song = getItem(position)
@@ -29,6 +25,7 @@ class FavoriteSongsAdapter(
         val songName = view.findViewById<TextView>(R.id.textViewNameFavSong)
         val artistName = view.findViewById<TextView>(R.id.artistnamesongfav)
         val floatingReproduce = view.findViewById<FloatingActionButton>(R.id.floatingActionButton5)
+        val floatingAddFav = view.findViewById<FloatingActionButton>(R.id.floatingActionButton7)
 
         song?.let { songItem ->
             songName.text = songItem.name
@@ -42,6 +39,10 @@ class FavoriteSongsAdapter(
             floatingReproduce.setOnClickListener {
                 onPlayClick(songItem)
             }
+
+            floatingAddFav.setOnClickListener {
+                onRemoveClick(songItem)
+            }
         }
 
         return view
@@ -52,5 +53,6 @@ class FavoriteSongsAdapter(
         notifyDataSetChanged()
     }
 }
+
 
 
